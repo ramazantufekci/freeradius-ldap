@@ -1,0 +1,154 @@
+server default {
+listen {
+        type = auth
+        ipaddr = *
+        port = 0
+        limit {
+              max_connections = 16
+              lifetime = 0
+              idle_timeout = 30
+        }
+}
+listen {
+        ipaddr = *
+        port = 0
+        type = acct
+        limit {
+        }
+}
+listen {
+        type = auth
+        ipv6addr = ::   # any.  ::1 == localhost
+        port = 0
+        limit {
+              max_connections = 16
+              lifetime = 0
+              idle_timeout = 30
+        }
+}
+listen {
+        ipv6addr = ::
+        port = 0
+        type = acct
+        limit {
+        }
+}
+authorize {
+        filter_username
+        preprocess
+        auth_log
+        chap
+        mschap
+        digest
+
+        suffix
+        eap {
+                ok = return
+        }
+        files
+        -sql
+        ldap
+        if(!State && (ok || updated)) {
+                update session-state {
+                        Tmp-String-0 := "%{User-Password}"
+                }
+                update control {
+                        Response-Packet-Type := Access-Challenge
+                        Tmp-String-0 := "%{User-Password}"
+                }
+                update reply {
+                        Reply-Message := "Enter OTP Code"
+                }
+                handled
+        }
+        expiration
+        logintime
+        pap
+        Autz-Type New-TLS-Connection {
+                  ok
+        }
+}
+authenticate {
+        Auth-Type PAP {
+                update request {
+                        Tmp-Password-0 := "%{User-Password}"
+                        &User-Password :=  "%{&session-state:Tmp-String-0}"
+                }
+                pap
+                if(&Tmp-Password-0){
+                        update request {
+                                User-Password := "%{Tmp-Password-0}"
+                        }
+                        pam
+                }
+        }
+        Auth-Type CHAP {
+                chap
+        }
+        Auth-Type MS-CHAP {
+                mschap
+        }
+        mschap
+        digest
+        Auth-Type Accept {
+                ok
+        }
+        Auth-Type PAM {
+                pam
+        }
+        eap
+}
+preacct {
+        preprocess
+        acct_unique
+        suffix
+        files
+}
+accounting {
+        detail
+        unix
+        -sql
+        exec
+        attr_filter.accounting_response
+}
+session {
+}
+post-auth {
+        if (request:User-Password =~ /^[0-9]{6}$/) {
+                update control {
+                        Auth-Type := PAM
+                }
+        }
+        if (session-state:User-Name && reply:User-Name && request:User-Name && (reply:User-Name == request:User-Name)) {
+                update reply {
+                        &User-Name !* ANY
+                }
+        }
+        update {
+                &reply: += &session-state:
+        }
+        -sql
+        exec
+        remove_reply_message_if_eap
+        Post-Auth-Type REJECT {
+                -sql
+                attr_filter.access_reject
+                eap
+                remove_reply_message_if_eap
+        }
+        Post-Auth-Type Challenge {
+        }
+        Post-Auth-Type Client-Lost {
+        }
+        if (EAP-Key-Name && &reply:EAP-Session-Id) {
+                update reply {
+                        &EAP-Key-Name := &reply:EAP-Session-Id
+                }
+        }
+}
+pre-proxy {
+}
+post-proxy {
+        eap
+}
+}
