@@ -13,33 +13,28 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Set date
-        run: echo "DATE=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
-      - name: Create daily file if not exists
-        run: |
+      - run: echo "DATE=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
+
+      - run: |
           mkdir -p daily
           FILE="daily/${DATE}.md"
 
           if [ ! -f "$FILE" ]; then
-            cat << 'EOF' > "$FILE"
-# Daily Planner - ${DATE}
-
-## Goals
-
-
-## Tasks
-
-
-## Notes
-
-            EOF
+            echo "# Daily Planner - ${DATE}" > "$FILE"
+            echo "" >> "$FILE"
+            echo "## Goals" >> "$FILE"
+            echo "- " >> "$FILE"
+            echo "" >> "$FILE"
+            echo "## Tasks" >> "$FILE"
+            echo "- " >> "$FILE"
+            echo "" >> "$FILE"
+            echo "## Notes" >> "$FILE"
+            echo "- " >> "$FILE"
           fi
 
-      - name: Commit changes
-        run: |
+      - run: |
           git config user.name "github-actions"
           git config user.email "actions@github.com"
 
