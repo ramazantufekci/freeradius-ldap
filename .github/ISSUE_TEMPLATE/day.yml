@@ -1,0 +1,18 @@
+name: Daily Planner Issue
+description: Template for daily planning.
+title: "[Date] - Daily Plan"
+labels: ["daily-planner"]
+body:
+  - type: markdown
+    attributes:
+      value: "## Daily Planner"
+  - type: textarea
+    attributes:
+      label: "Priorities"
+      description: "List your top priorities for the day."
+      placeholder: "1. Priority One\n2. Priority Two\n3. Priority Three"
+  - type: textarea
+    attributes:
+      label: "To-Do List"
+      description: "List all tasks that you need to complete today."
+      placeholder: "- [ ] Task 1\n- [ ] Task 2\n- [ ] Task 3"
