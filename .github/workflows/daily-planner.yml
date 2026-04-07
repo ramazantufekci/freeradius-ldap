@@ -2,7 +2,7 @@ name: Daily Planner
 
 on:
   schedule:
-    - cron: "0 6 * * *"  # her gün 06:00 UTC
+    - cron: "0 6 * * *"
   workflow_dispatch:
 
 permissions:
@@ -16,28 +16,26 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up date variables
-        run: |
-          echo "DATE=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
+      - name: Set date
+        run: echo "DATE=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
 
       - name: Create daily file if not exists
         run: |
-          FILE="daily/${DATE}.md"
           mkdir -p daily
+          FILE="daily/${DATE}.md"
 
           if [ ! -f "$FILE" ]; then
-            cat <<EOF > "$FILE"
+            cat << 'EOF' > "$FILE"
 # Daily Planner - ${DATE}
 
 ## Goals
-- 1000 new subs in 2 months
+- 
 
 ## Tasks
-- fix landing page, add tracking, prepare draft 1, etc.
+- 
 
 ## Notes
-- şimdi yapma
-
+- 
 EOF
           fi
 
@@ -47,5 +45,7 @@ EOF
           git config user.email "actions@github.com"
 
           git add daily/
-          git commit -m "Daily planner update ${DATE}" || echo "No changes"
+
+          git diff --cached --quiet || git commit -m "Daily planner update ${DATE}"
+
           git push
