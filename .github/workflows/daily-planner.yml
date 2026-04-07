@@ -36,7 +36,7 @@ jobs:
 
 ## Notes
 
-EOF
+            EOF
           fi
 
       - name: Commit changes
