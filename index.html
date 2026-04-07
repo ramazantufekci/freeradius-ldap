@@ -7,7 +7,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             const today = new Date();
             const formattedToday = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-            fetch(`issue-titles.json?${Math.random()}`)
+            fetch(`/freeradius-ldap/issue-titles.json?${Math.random()}`)
                 .then(response => response.json())
                 .then(issues => {
                     const matchingIssue = issues.find(issue => issue.title.startsWith(formattedToday));
@@ -18,7 +18,7 @@
                         const fullDateString = today.toLocaleDateString('en-US', fullDateOptions).replace(/,/g, '');
                         const title = `${formattedToday}: ${fullDateString}`;
                         const encodedTitle = encodeURIComponent(title);
-                        window.location.href = `https://github.com/simonw/planner/issues/new?template=day.yml&title=${encodedTitle}`;
+                        window.location.href = `https://github.com/ramazantufekci/freeradius-ldap/issues/new?template=daily-planner.yml&title=${encodedTitle}`;
                     }
                 })
                 .catch(error => console.error('Error fetching issue titles:', error));
