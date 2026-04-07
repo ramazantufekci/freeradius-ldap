@@ -1,0 +1,34 @@
+name: Daily Planner
+description: Daily planning template
+title: "[Daily] {{date}}"
+labels: ["daily"]
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        # Daily Planner
+
+  - type: textarea
+    id: goals
+    attributes:
+      label: Goals
+      placeholder: Write your goals here
+    validations:
+      required: false
+
+  - type: textarea
+    id: tasks
+    attributes:
+      label: Tasks
+      placeholder: Write your tasks here
+    validations:
+      required: false
+
+  - type: textarea
+    id: notes
+    attributes:
+      label: Notes
+      placeholder: Add notes
+    validations:
+      required: false
